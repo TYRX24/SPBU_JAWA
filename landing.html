@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPBU Peta — Temukan SPBU Terdekat di Seluruh Jawa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: rgb(14, 18, 28);
+    --bg-2: rgb(10, 13, 20);
+    --card: rgb(20, 26, 40);
+    --card-2: rgb(28, 36, 54);
+    --border: rgb(44, 56, 80);
+    --border-2: rgb(36, 48, 68);
+    --border-soft: rgb(32, 42, 62);
+    --text: rgb(230, 235, 245);
+    --text-2: rgb(175, 195, 220);
+    --text-3: rgb(120, 145, 175);
+    --accent: rgb(251, 191, 36);
+    --accent-glow: rgba(251, 191, 36, 0.3);
+    --accent-glow-strong: rgba(251, 191, 36, 0.5);
+    --ink: rgb(14, 18, 28);
+    --footer: rgb(10, 13, 20);
+    --pertamina: rgb(239, 68, 68);
+    --shell: rgb(251, 191, 36);
+    --bp: rgb(16, 185, 129);
+    --vivo: rgb(59, 130, 246);
+  }
+
+  [data-theme="light"] {
+    --bg: rgb(252, 252, 254);
+    --bg-2: rgb(248, 249, 252);
+    --card: rgb(255, 255, 255);
+    --card-2: rgb(245, 247, 252);
+    --border: rgb(220, 228, 240);
+    --border-2: rgb(228, 235, 245);
+    --border-soft: rgb(224, 232, 242);
+    --text: rgb(18, 28, 45);
+    --text-2: rgb(50, 70, 100);
+    --text-3: rgb(120, 140, 165);
+    --accent: rgb(230, 120, 10);  /* Ganti dengan pilihan Hans */
+    --accent-glow: rgba(230, 120, 10, 0.2);
+    --accent-glow-strong: rgba(230, 120, 10, 0.4);
+    --ink: rgb(255, 255, 255);
+    --footer: rgb(243, 246, 252);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  body {
+    overflow-x: hidden;
+    background-image:
+      linear-gradient(rgba(100,150,255,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,150,255,0.07) 1px, transparent 1px);
+    background-size: 52px 52px;
+  }
+  [data-theme="light"] body {
+    background-image:
+      linear-gradient(rgba(50,100,200,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(50,100,200,0.06) 1px, transparent 1px);
+    background-size: 52px 52px;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── THEME TOGGLE ─────────────────────────────────── */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-soft);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover {
+    background: var(--card-2);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.08);
+  }
+  .theme-toggle:active { transform: scale(0.94); }
+  .theme-toggle svg { transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .theme-toggle:hover svg { transform: rotate(20deg); }
+
+  /* ── NAV ─────────────────────────────────────────── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--footer);
+    border-bottom: 1px solid var(--border-soft);
+    height: 65px;
+    backdrop-filter: blur(20px);
+  }
+  .nav-inner {
+    display: flex; align-items: center;
+    height: 64px;
+  }
+  .logo {
+    color: var(--accent); font-size: 20px; letter-spacing: -1px; font-weight: 400;
+    flex: 0 0 auto; min-width: 130px;
+  }
+  .nav-links {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 32px;
+  }
+  .nav-right {
+    flex: 0 0 auto; min-width: 130px;
+    display: flex; align-items: center; gap: 10px; justify-content: flex-end;
+  }
+  .nav-link {
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-2);
+    transition: color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .nav-link:hover { color: var(--accent); }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0; bottom: -6px; height: 1px; width: 0%;
+    background: var(--accent); transition: width 0.3s ease;
+  }
+  .nav-link:hover::after { width: 100%; }
+  .btn-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: var(--ink);
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 12px;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    padding: 8px 16px; border: none; cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  }
+  .btn-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+  .btn-cta:active { transform: translateY(0) scale(0.96); }
+  .btn-cta svg { transition: transform 0.2s; }
+  .btn-cta:hover svg { transform: translateX(2px); }
+
+  /* ── HERO ───────────────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 128px 20px;
+    text-align: center;
+    overflow: hidden;
+    isolation: isolate;
+    clip-path: inset(0);
+  }
+  .hero::before {
+    content: ""; position: fixed; inset: 0; z-index: -2;
+    background: url("landing/hero-bg.png") center / cover no-repeat;
+    opacity: 0.6;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background:
+      linear-gradient(to bottom, rgba(14,18,28,0.2) 0%, transparent 20%, transparent 50%, rgba(14,18,28,0.8) 82%, rgb(14,18,28) 100%);
+  }
+  [data-theme="light"] .hero::after {
+    background:
+      linear-gradient(to right,  rgb(252,252,254) 0%, transparent 18%, transparent 82%, rgb(252,252,254) 100%),
+      linear-gradient(to bottom, rgba(252,252,254,0.2) 0%, transparent 20%, transparent 50%, rgba(252,252,254,0.8) 82%, rgb(252,252,254) 100%);
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 12px;
+    background: var(--card-2); border: 1px solid var(--border);
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-2);
+    margin-bottom: 24px;
+    animation: fade-up 0.7s ease both;
+  }
+  .badge-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow-strong);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+  .hero h1 {
+    font-size: 32px; font-weight: 700; line-height: 40px; letter-spacing: -0.8px;
+    color: var(--text); max-width: 620px; margin: 0 auto 24px;
+    animation: fade-up 0.7s 0.1s ease both;
+  }
+  .hero p {
+    font-size: 18px; line-height: 28px; color: var(--text-2);
+    max-width: 660px; margin: 0 auto 32px;
+    animation: fade-up 0.7s 0.2s ease both;
+  }
+  .hero-buttons {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    animation: fade-up 0.7s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--ink);
+    padding: 17px 32px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 16px;
+    border: none; cursor: pointer;
+    box-shadow: 0 0 20px var(--accent-glow);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow-strong); }
+  .btn-primary:active { transform: translateY(0) scale(0.97); }
+  .btn-secondary {
+    background: transparent; color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 16px 32px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+  }
+  .btn-secondary:hover { transform: translateY(-2px); background: rgba(251, 191, 36, 0.08); }
+  .btn-secondary:active { transform: translateY(0) scale(0.97); }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── STATS ──────────────────────────────────────── */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border-2);
+  }
+  .stat {
+    background: var(--card); border-right: 1px solid var(--border);
+    padding: 24px; text-align: center;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .stat:last-child { border-right: none; }
+  .stat:hover { background: var(--card-2); transform: translateY(-2px); }
+  .stat-num {
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 24px;
+    color: var(--accent); margin-bottom: 8px; line-height: 24px;
+  }
+  .stat-label {
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-2);
+  }
+
+  /* ── SECTIONS ──────────────────────────────────── */
+  section.block { padding: 80px 0; }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 32px;
+  }
+  .section-head h2 {
+    font-size: 20px; font-weight: 700; line-height: 28px; color: var(--text);
+  }
+  .section-head .meta {
+    display: flex; align-items: center; gap: 4px;
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: 0.6px; color: var(--text-2);
+  }
+
+  /* ── PRICE CARDS ─────────────────────────────────── */
+  .prices {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .price-card {
+    position: relative; overflow: hidden;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, background 0.2s;
+  }
+  .price-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .price-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--brand-color, var(--pertamina));
+  }
+  .price-card[data-brand="pertamina"] { --brand-color: var(--pertamina); }
+  .price-card[data-brand="shell"]     { --brand-color: var(--shell); }
+  .price-card[data-brand="bp"]        { --brand-color: var(--bp); }
+  .price-card[data-brand="vivo"]      { --brand-color: var(--vivo); }
+  .price-card h3 {
+    font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px;
+  }
+  .price-row {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-2);
+    padding: 8px 0;
+  }
+  .price-row:last-child { border-bottom: none; }
+  .price-fuel {
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: 0.6px; color: var(--text-2);
+    white-space: nowrap;
+  }
+  .price-amount {
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 18px;
+    color: var(--text); line-height: 30px;
+    white-space: nowrap;
+  }
+  .price-tag {
+    display: inline-block;
+    font-family: "Space Grotesk", sans-serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--card-2); color: var(--text-3);
+    border: 1px solid var(--border-2);
+    vertical-align: middle; margin-left: 5px; line-height: 14px;
+  }
+  .price-category {
+    font-family: "Space Grotesk", sans-serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-3);
+    padding: 8px 0 4px; display: block;
+    border-top: 1px solid var(--border-2); margin-top: 4px;
+  }
+  .price-category:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+
+  /* ── FEATURES BENTO ─────────────────────────────── */
+  .features-head { text-align: center; margin-bottom: 48px; }
+  .features-head h2 {
+    font-size: 32px; font-weight: 700; line-height: 38.4px; color: var(--text);
+    margin-bottom: 16px;
+  }
+  .features-head p {
+    font-size: 16px; line-height: 24px; color: var(--text-2);
+  }
+  .bento {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+  }
+  .bento-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s;
+  }
+  .bento-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .bento-card .icon {
+    width: 27px; height: 27px; color: var(--accent); margin-bottom: 8px;
+  }
+  .bento-card h3 {
+    font-size: 20px; font-weight: 700; line-height: 28px; color: var(--text);
+    padding: 8px 0;
+  }
+  .bento-card p {
+    font-size: 14px; line-height: 19.6px; color: var(--text-2);
+  }
+  .bento-big {
+    grid-row: span 2;
+    padding: 32px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 417px;
+  }
+  .bento-big h3 {
+    font-size: 20px; font-weight: 700; line-height: 28px; padding: 8px 0;
+  }
+  .bento-big p {
+    font-size: 16px; line-height: 24px;
+  }
+  .bento-big-preview {
+    position: relative; flex: 1; min-height: 192px; margin-top: 32px;
+    background: var(--card-2); border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden;
+  }
+  .bento-big-preview .grid-bg {
+    position: absolute; inset: 0; opacity: 0.3;
+    background-image:
+      linear-gradient(rgba(251,191,36,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(251,191,36,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .bento-big-pin {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--accent); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px var(--accent-glow-strong);
+    animation: pin-bob 2.5s ease-in-out infinite;
+  }
+  .bento-big-pin::after {
+    content: ""; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 8px; height: 8px; background: var(--accent);
+  }
+  @keyframes pin-bob {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50% { transform: translate(-50%, -55%); }
+  }
+  .bento-big-pulse {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 48px; height: 48px; border-radius: 12px;
+    border: 2px solid var(--accent);
+    animation: ring 2s ease-out infinite;
+  }
+  @keyframes ring {
+    0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
+  }
+
+  /* ── FOOTER ─────────────────────────────────────── */
+  .footer {
+    background: var(--footer); border-top: 1px solid var(--border-soft);
+    padding: 40px 20px; opacity: 0.95;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center; gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-brand { font-size: 18px; font-weight: 700; color: var(--text); }
+  .footer-copy { font-size: 14px; line-height: 22.75px; color: var(--text-3); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-link {
+    font-size: 14px; line-height: 22.75px; color: var(--text-3);
+    transition: color 0.2s;
+  }
+  .footer-link:hover { color: var(--accent); }
+
+  /* ── PRICE CHART ─────────────────────────────────── */
+  .price-card { cursor: pointer; }
+  .price-card.chart-active {
+    border-color: var(--brand-color, var(--accent)) !important;
+    background: color-mix(in srgb, var(--brand-color, var(--accent)) 7%, var(--card-2));
+    transform: translateY(-4px);
+  }
+  .price-card:hover {
+    background: var(--card-2);
+  }
+  .price-card.chart-active::after {
+    content: "✓ Ditampilkan di grafik";
+    display: block; margin-top: 14px;
+    font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--brand-color, var(--accent)); text-align: center;
+  }
+  .price-chart-section { margin-top: 0; }
+  .price-chart-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .price-chart-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .price-chart-subtitle { font-size: 12px; color: var(--text-3); }
+  .chart-range-group { display: flex; gap: 6px; }
+  .chart-range-btn {
+    font-family: "Space Grotesk", sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.4px; padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--card-2); color: var(--text-3);
+    transition: all 0.2s;
+  }
+  .chart-range-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .chart-range-btn.active { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .chart-wrap {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px 28px;
+  }
+  .chart-legend {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px;
+    padding-top: 16px; border-top: 1px solid var(--border-2);
+  }
+  .chart-legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--text-2); cursor: pointer; transition: opacity 0.2s;
+  }
+  .chart-legend-item.muted { opacity: 0.3; }
+  .chart-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chart-hint { font-size: 11px; color: var(--text-3); margin-top: 14px; text-align: right; }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  .bex-sport-img {
+  width: 100%; 
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  object-position: center;
+  margin-top: 14px; 
+  display: block;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+}
+  .bex-sport-caption {
+    font-size: 11px; color: var(--text-3); margin-top: 7px;
+    font-family: "Space Grotesk", sans-serif; letter-spacing: 0.3px;
+    font-style: italic;
+  }
+
+  /* ── BRAND PROFILES ─────────────────────────────── */
+  .brand-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .brand-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px 20px; text-align: center; cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, background 0.2s;
+    position: relative; overflow: hidden;
+    user-select: none;
+  }
+  .brand-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--brand-color, var(--pertamina)); opacity: 0; transition: opacity 0.2s;
+  }
+  .brand-card:hover { transform: translateY(-4px); border-color: var(--brand-color, var(--accent)); }
+  .brand-card:hover::before, .brand-card.active::before { opacity: 1; }
+  .brand-card.active { border-color: var(--brand-color, var(--accent)); background: var(--card-2); }
+  .brand-card[data-brand="pertamina"] { --brand-color: var(--pertamina); }
+  .brand-card[data-brand="shell"]     { --brand-color: var(--shell); }
+  .brand-card[data-brand="bp"]        { --brand-color: var(--bp); }
+  .brand-card[data-brand="vivo"]      { --brand-color: var(--vivo); }
+  .brand-logo-wrap {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 20px;
+    background: color-mix(in srgb, var(--brand-color) 14%, var(--card-2));
+    color: var(--brand-color);
+    border: 1px solid color-mix(in srgb, var(--brand-color) 28%, transparent);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .brand-card:hover .brand-logo-wrap, .brand-card.active .brand-logo-wrap { transform: scale(1.08); }
+  .brand-card-name {
+    font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px;
+  }
+  .brand-card-origin {
+    font-family: "Space Grotesk", sans-serif; font-size: 11px; font-weight: 500;
+    color: var(--text-3); letter-spacing: 0.4px; margin-bottom: 16px;
+  }
+  .brand-card-hr { border: none; border-top: 1px solid var(--border-2); margin-bottom: 14px; }
+  .brand-card-count {
+    font-family: "Space Grotesk", sans-serif; font-size: 26px; font-weight: 700;
+    color: var(--brand-color, var(--accent)); line-height: 1; margin-bottom: 4px;
+  }
+  .brand-card-count-label {
+    font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-3);
+  }
+  .brand-card-hint {
+    margin-top: 14px; font-size: 11px; color: var(--text-3);
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: color 0.2s;
+  }
+  .brand-card:hover .brand-card-hint, .brand-card.active .brand-card-hint {
+    color: var(--brand-color);
+  }
+
+  /* ── EXPAND PANEL ────────────────────────────────── */
+  .brand-expand {
+    overflow: hidden; max-height: 0;
+    transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin-top 0.3s ease;
+    opacity: 0; margin-top: 0;
+  }
+  .brand-expand.open {
+    max-height: 900px; opacity: 1; margin-top: 16px;
+  }
+  .brand-expand-inner {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 28px 32px;
+    border-left: 4px solid var(--expand-color, var(--accent));
+    display: grid; grid-template-columns: 1fr 1px 1fr; gap: 32px;
+  }
+  .bex-divider { background: var(--border-2); }
+  .bex-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border-2);
+  }
+  .bex-logo {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 17px;
+    background: color-mix(in srgb, var(--expand-color) 14%, var(--card-2));
+    color: var(--expand-color);
+    border: 1px solid color-mix(in srgb, var(--expand-color) 28%, transparent);
+  }
+  .bex-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .bex-origin { font-family: "Space Grotesk", sans-serif; font-size: 12px; color: var(--text-3); }
+  .bex-desc {
+    font-size: 14px; line-height: 22px; color: var(--text-2); margin-bottom: 14px;
+  }
+  .bex-famous {
+    font-size: 13px; line-height: 20px; color: var(--text-3);
+    padding: 10px 14px; background: var(--card-2); border-radius: 6px;
+    border-left: 3px solid var(--expand-color, var(--accent));
+  }
+  .bex-famous strong { color: var(--text-2); font-weight: 600; }
+  .bex-section-title {
+    font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .bex-fuels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
+  .bex-fuel-pill {
+    font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px;
+    background: color-mix(in srgb, var(--expand-color) 12%, var(--card-2));
+    color: var(--expand-color);
+    border: 1px solid color-mix(in srgb, var(--expand-color) 25%, transparent);
+  }
+  .bex-services { display: flex; flex-direction: column; gap: 9px; }
+  .bex-service { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-2); line-height: 18px; }
+  .bex-service-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--expand-color); flex-shrink: 0; margin-top: 6px;
+  }
+  .bex-history {
+  font-size: 13px; line-height: 20px; color: var(--text-2);
+  margin-top: 10px; padding: 10px 12px;
+  background: color-mix(in srgb, var(--expand-color) 8%, var(--card-2));
+  border-left: 3px solid var(--expand-color);
+  border-radius: 4px;
+  }
+
+  /* ── BRAND LOGO IMG ───────────────────────────────── */
+  .brand-logo-img {
+    width: 34px; height: 34px; object-fit: contain;
+    display: block;
+  }
+  .brand-logo-wrap.logo-img-wrap {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--border-2);
+    padding: 5px;
+  }
+  .bex-logo.logo-img-wrap {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--border-2);
+  }
+  .bex-logo-img {
+    width: 30px; height: 30px; object-fit: contain;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .prices { grid-template-columns: repeat(2, 1fr); }
+    .brand-grid { grid-template-columns: repeat(2, 1fr); }
+    .brand-expand-inner { grid-template-columns: 1fr; }
+    .bex-divider { display: none; }
+    .bento { grid-template-columns: 1fr; }
+    .bento-big { grid-row: auto; min-height: 360px; }
+    .nav-links { display: none; }
+    .logo { min-width: 0; }
+    .nav-right { min-width: 0; }
+    .hero h1 { font-size: 28px; line-height: 36px; }
+    .section-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <span class="logo">SPBU PETA</span>
+    <div class="nav-links">
+      <a class="nav-link" href="#harga">Harga BBM</a>
+      <a class="nav-link" href="#fitur">Fitur</a>
+      <a class="nav-link" href="#tentang">Tentang</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema" title="Ganti tema">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="btn-cta">
+        Buka Aplikasi
+        <svg width="10" height="10" viewBox="0 0 9.333 9.333" fill="currentColor">
+          <path d="M 7.102 5.25 L 0 5.25 L 0 4.083 L 7.102 4.083 L 3.835 0.817 L 4.667 0 L 9.333 4.667 L 4.667 9.333 L 3.835 8.517 L 7.102 5.25 Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="badge">
+    <span class="badge-dot"></span>
+    Berbasis Data OpenStreetMap
+  </span>
+  <h1>Temukan SPBU Terdekat di Seluruh Jawa</h1>
+  <p>Peta interaktif 8.000+ SPBU se-Jawa — lengkap dengan harga BBM, fasilitas, dan petunjuk arah. Dirancang khusus untuk pengemudi dengan antarmuka yang cepat dan andal.</p>
+  <div class="hero-buttons">
+    <button class="btn-primary">Buka Peta</button>
+    <button class="btn-secondary">Lihat Fitur</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="container">
+  <div class="stats reveal">
+    <div class="stat">
+      <div class="stat-num">8.000+</div>
+      <div class="stat-label">Titik SPBU</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Brand Ternama</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">15.000+</div>
+      <div class="stat-label">Fasilitas Umum</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Provinsi Se-Jawa</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICES -->
+<section class="block" id="harga">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Harga BBM Terkini</h2>
+      <span class="meta">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+        </svg>
+        Hari Ini
+      </span>
+    </div>
+    <div class="prices">
+
+      <!-- Pertamina -->
+      <div class="price-card reveal" data-brand="pertamina" onclick="selectBrandChart('pertamina', this)">
+        <h3>Pertamina</h3>
+        <span class="price-category">Bensin</span>
+        <div class="price-row">
+          <span class="price-fuel">Pertalite <span class="price-tag">RON 90</span></span>
+          <span class="price-amount">Rp 10.000</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Pertamax <span class="price-tag">RON 92</span></span>
+          <span class="price-amount">Rp 12.950</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Pertamax Turbo <span class="price-tag">RON 98</span></span>
+          <span class="price-amount">Rp 14.000</span>
+        </div>
+        <span class="price-category">Solar / Diesel</span>
+        <div class="price-row">
+          <span class="price-fuel">Solar <span class="price-tag">CN 48</span></span>
+          <span class="price-amount">Rp 6.800</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Dexlite <span class="price-tag">CN 51</span></span>
+          <span class="price-amount">Rp 13.700</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Pertamina Dex <span class="price-tag">CN 53</span></span>
+          <span class="price-amount">Rp 14.050</span>
+        </div>
+      </div>
+
+      <!-- Shell -->
+      <div class="price-card reveal" data-brand="shell" style="transition-delay:.05s" onclick="selectBrandChart('shell', this)">
+        <h3>Shell</h3>
+        <span class="price-category">Bensin</span>
+        <div class="price-row">
+          <span class="price-fuel">Shell Super <span class="price-tag">RON 92</span></span>
+          <span class="price-amount">Rp 15.360</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Shell V-Power <span class="price-tag">RON 95</span></span>
+          <span class="price-amount">Rp 15.760</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">V-Power Nitro+ <span class="price-tag">RON 98</span></span>
+          <span class="price-amount">Rp 16.290</span>
+        </div>
+        <span class="price-category">Solar / Diesel</span>
+        <div class="price-row">
+          <span class="price-fuel">Shell Diesel Extra <span class="price-tag">CN 51</span></span>
+          <span class="price-amount">Rp 15.430</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">V-Power Diesel <span class="price-tag">CN 53</span></span>
+          <span class="price-amount">Rp 16.130</span>
+        </div>
+      </div>
+
+      <!-- BP -->
+      <div class="price-card reveal" data-brand="bp" style="transition-delay:.1s" onclick="selectBrandChart('bp', this)">
+        <h3>BP</h3>
+        <span class="price-category">Bensin</span>
+        <div class="price-row">
+          <span class="price-fuel">BP 90 <span class="price-tag">RON 90</span></span>
+          <span class="price-amount">Rp 15.360</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">BP 92 <span class="price-tag">RON 92</span></span>
+          <span class="price-amount">Rp 15.560</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">BP Ultimate 95 <span class="price-tag">RON 95</span></span>
+          <span class="price-amount">Rp 15.760</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">BP Ultimate 98 <span class="price-tag">RON 98</span></span>
+          <span class="price-amount">Rp 16.180</span>
+        </div>
+        <span class="price-category">Solar / Diesel</span>
+        <div class="price-row">
+          <span class="price-fuel">BP Diesel <span class="price-tag">CN 51</span></span>
+          <span class="price-amount">Rp 15.430</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">BP Ultimate Diesel <span class="price-tag">CN 53</span></span>
+          <span class="price-amount">Rp 16.130</span>
+        </div>
+      </div>
+
+      <!-- VIVO -->
+      <div class="price-card reveal" data-brand="vivo" style="transition-delay:.15s" onclick="selectBrandChart('vivo', this)">
+        <h3>VIVO</h3>
+        <span class="price-category">Bensin</span>
+        <div class="price-row">
+          <span class="price-fuel">Revvo 89 <span class="price-tag">RON 89</span></span>
+          <span class="price-amount">Rp 13.190</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Revvo 92 <span class="price-tag">RON 92</span></span>
+          <span class="price-amount">Rp 14.490</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Revvo 95 <span class="price-tag">RON 95</span></span>
+          <span class="price-amount">Rp 15.190</span>
+        </div>
+        <span class="price-category">Solar / Diesel</span>
+        <div class="price-row">
+          <span class="price-fuel">Diesel CN 48 <span class="price-tag">CN 48</span></span>
+          <span class="price-amount">Rp 13.700</span>
+        </div>
+        <div class="price-row">
+          <span class="price-fuel">Diesel CN 51 <span class="price-tag">CN 51</span></span>
+          <span class="price-amount">Rp 14.300</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRICE CHART -->
+<section class="block" id="grafik" style="padding-top: 0">
+  <div class="container">
+    <div class="chart-wrap reveal">
+      <div class="price-chart-header">
+        <div>
+          <p class="price-chart-title" id="chartTitle">Perbandingan Harga RON 92 — Semua Brand</p>
+          <p class="price-chart-subtitle" id="chartSubtitle">Klik card harga di atas untuk melihat semua BBM brand tersebut</p>
+        </div>
+        <div class="chart-range-group">
+          <button class="chart-range-btn active" onclick="setChartRange(5, this)">5 Tahun</button>
+          <button class="chart-range-btn" onclick="setChartRange(10, this)">10 Tahun</button>
+        </div>
+      </div>
+      <canvas id="priceChart" height="90"></canvas>
+      <div class="chart-legend" id="chartLegend"></div>
+      <p class="chart-hint">* Data bersifat indikatif berdasarkan penetapan harga resmi masing-masing brand</p>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND PROFILES -->
+<section class="block" id="brand">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Kenali Brand SPBU</h2>
+      <span class="meta">Klik kartu untuk profil lengkap</span>
+    </div>
+    <div class="brand-grid">
+      <div class="brand-card reveal" data-brand="pertamina" onclick="selectBrand('pertamina', this)">
+        <div class="brand-logo-wrap logo-img-wrap"><img src="./public/assets/Logo/PERTAMINA_id7hJAjeL4_0.svg" alt="Pertamina" class="brand-logo-img"></div>
+        <p class="brand-card-name">Pertamina</p>
+        <p class="brand-card-origin">🇮🇩 Indonesia</p>
+        <hr class="brand-card-hr">
+        <p class="brand-card-count">712</p>
+        <p class="brand-card-count-label">SPBU di Jawa</p>
+        <p class="brand-card-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+          Lihat profil
+        </p>
+      </div>
+      <div class="brand-card reveal" data-brand="shell" style="transition-delay:.05s" onclick="selectBrand('shell', this)">
+        <div class="brand-logo-wrap logo-img-wrap"><img src="./public/assets/Logo/Shell_id0Yn1dyVO_1.svg" alt="Shell" class="brand-logo-img"></div>
+        <p class="brand-card-name">Shell</p>
+        <p class="brand-card-origin">🇳🇱 Belanda</p>
+        <hr class="brand-card-hr">
+        <p class="brand-card-count">198</p>
+        <p class="brand-card-count-label">SPBU di Jawa</p>
+        <p class="brand-card-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+          Lihat profil
+        </p>
+      </div>
+      <div class="brand-card reveal" data-brand="bp" style="transition-delay:.1s" onclick="selectBrand('bp', this)">
+        <div class="brand-logo-wrap logo-img-wrap"><img src="./public/assets/Logo/Bp_Symbol_0.svg" alt="BP" class="brand-logo-img"></div>
+        <p class="brand-card-name">BP</p>
+        <p class="brand-card-origin">🇬🇧 Inggris</p>
+        <hr class="brand-card-hr">
+        <p class="brand-card-count">87</p>
+        <p class="brand-card-count-label">SPBU di Jawa</p>
+        <p class="brand-card-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+          Lihat profil
+        </p>
+      </div>
+      <div class="brand-card reveal" data-brand="vivo" style="transition-delay:.15s" onclick="selectBrand('vivo', this)">
+        <div class="brand-logo-wrap logo-img-wrap"><img src="./public/assets/Logo/Logo_Vivo_Energy_Indonesia.png" alt="VIVO" class="brand-logo-img"></div>
+        <p class="brand-card-name">VIVO</p>
+        <p class="brand-card-origin">🇮🇩 Indonesia (Vitol)</p>
+        <hr class="brand-card-hr">
+        <p class="brand-card-count">43</p>
+        <p class="brand-card-count-label">SPBU di Jawa</p>
+        <p class="brand-card-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+          Lihat profil
+        </p>
+      </div>
+    </div>
+    <div class="brand-expand" id="brand-expand"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="block" id="fitur">
+  <div class="container">
+    <div class="features-head reveal">
+      <h2>Semua yang Kamu Butuhkan</h2>
+      <p>Fitur esensial yang dirancang untuk kebutuhan di jalan raya.</p>
+    </div>
+    <div class="bento">
+      <!-- Big Card: Peta Interaktif -->
+      <div class="bento-card bento-big reveal">
+        <div>
+          <svg class="icon" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/>
+          </svg>
+          <h3>Peta Interaktif 🗺️</h3>
+          <p>Navigasi mulus dengan titik SPBU akurat. Didesain dengan kontras tinggi untuk visibilitas maksimal saat berkendara malam hari.</p>
+        </div>
+        <div class="bento-big-preview">
+          <div class="grid-bg"></div>
+          <div class="bento-big-pulse"></div>
+          <div class="bento-big-pin">
+            <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card reveal" style="transition-delay:.05s">
+        <svg class="icon" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <h3>Petunjuk Arah 📍</h3>
+        <p>Integrasi langsung dengan aplikasi navigasi pilihan Anda untuk rute tercepat ke SPBU tujuan.</p>
+      </div>
+
+      <div class="bento-card reveal" style="transition-delay:.1s">
+        <svg class="icon" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="2" fill="currentColor"/>
+        </svg>
+        <h3>SPBU Terdekat ⛽</h3>
+        <p>Akses instan ke lokasi SPBU dalam radius terdekat berdasarkan posisi GPS Anda secara real-time.</p>
+      </div>
+
+      <div class="bento-card reveal" style="transition-delay:.15s">
+        <svg class="icon" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        <h3>Harga BBM 💰</h3>
+        <p>Informasi harga bahan bakar terbaru dari berbagai operator (Pertamina, Shell, BP, VIVO) selalu ter-update.</p>
+      </div>
+
+      <div class="bento-card reveal" style="transition-delay:.2s">
+        <svg class="icon" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor"/>
+        </svg>
+        <h3>Dark / Light Mode 🌓</h3>
+        <p>Tampilan antarmuka yang menyesuaikan dengan kondisi cahaya untuk mengurangi kelelahan mata saat mengemudi di malam hari.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="tentang">
+  <div class="container footer-inner">
+    <span class="footer-brand">SPBU Peta</span>
+    <span class="footer-copy">© 2024 SPBU Peta Interaktif. Infrastruktur Digital Pengemudi Indonesia.</span>
+    <div class="footer-links">
+      <a class="footer-link" href="#">Kebijakan Privasi</a>
+      <a class="footer-link" href="#">Syarat &amp; Ketentuan</a>
+      <a class="footer-link" href="#">Kontak Layanan</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal-on-scroll
+
+  // ── Theme Toggle ──────────────────────────────────
+  const ICON_DARK  = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const ICON_LIGHT = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.innerHTML = theme === 'light' ? ICON_LIGHT : ICON_DARK;
+    localStorage.setItem('spbu-theme', theme);
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    // Rebuild chart dengan warna tema baru (aman: dipanggil setelah halaman penuh load)
+    if (priceChart) {
+      const slicedYears = ALL_YEARS.slice(-currentRange);
+      const source = activeBrandChart ? BRAND_SERIES[activeBrandChart].series : RON92_SERIES;
+      buildChart(slicedYears, source.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+    }
+  }
+
+  // Init: pakai preferensi tersimpan, fallback ke dark
+  const savedTheme = localStorage.getItem('spbu-theme') || 'dark';
+  applyTheme(savedTheme);
+
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+  // Smooth nav scrolling
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const id = a.getAttribute("href");
+      if (id.length > 1) {
+        const t = document.querySelector(id);
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      }
+    });
+  });
+
+  // ── Price Chart ───────────────────────────────────
+  function getChartTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    return {
+      grid:    isLight ? 'rgba(218,216,212,0.6)' : 'rgba(53,53,52,0.5)',
+      tick:    isLight ? 'rgb(110,108,104)' : 'rgb(163,163,163)',
+      tooltipBg:     isLight ? 'rgb(255,255,255)' : 'rgb(28,27,27)',
+      tooltipBorder: isLight ? 'rgb(218,216,212)' : 'rgb(53,53,52)',
+      tooltipTitle:  isLight ? 'rgb(18,18,18)'    : 'rgb(229,226,225)',
+      tooltipBody:   isLight ? 'rgb(110,108,104)' : 'rgb(163,163,163)',
+    };
+  }
+
+  const ALL_YEARS = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+
+  const RON92_SERIES = [
+    { label:'Pertamina Pertamax (RON 92)', color:'rgb(239,68,68)',   data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950] },
+    { label:'Shell Super (RON 92)',         color:'rgb(251,191,36)',  data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360] },
+    { label:'BP 92 (RON 92)',               color:'rgb(16,185,129)',  data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560] },
+    { label:'VIVO Revvo 92 (RON 92)',       color:'rgb(59,130,246)',  data:[null,null,null,null,9500,9800,13200,14490,14490,14490] },
+  ];
+
+  const BRAND_SERIES = {
+    pertamina: {
+      title: 'Semua Harga BBM — Pertamina',
+      subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
+      series: [
+        { label:'Pertalite (RON 90)',       color:'rgb(251,113,113)', data:[7350,7500,7800,7650,7650,7650,10000,10000,10000,10000] },
+        { label:'Pertamax (RON 92)',         color:'rgb(239,68,68)',   data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950] },
+        { label:'Pertamax Turbo (RON 98)',  color:'rgb(185,28,28)',   data:[null,null,10900,12000,10900,10900,14500,14000,14000,14000] },
+        { label:'Solar (CN 48)',            color:'rgb(134,239,172)', data:[5650,5650,5650,5650,5650,5650,6800,6800,6800,6800] },
+        { label:'Dexlite (CN 51)',          color:'rgb(16,185,129)',  data:[null,7500,8000,9500,9200,9500,17800,13700,13700,13700] },
+        { label:'Pertamina Dex (CN 53)',    color:'rgb(5,150,105)',   data:[null,null,10200,11500,10500,10500,18000,14050,14050,14050] },
+      ]
+    },
+    shell: {
+      title: 'Semua Harga BBM — Shell',
+      subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
+      series: [
+        { label:'Shell Super (RON 92)',       color:'rgb(253,224,71)',  data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360] },
+        { label:'Shell V-Power (RON 95)',     color:'rgb(251,191,36)',  data:[9550,9800,10400,11000,10500,10500,14300,15760,15760,15760] },
+        { label:'V-Power Nitro+ (RON 98)',   color:'rgb(202,138,4)',   data:[10200,10600,11200,12000,11500,11500,15500,16290,16290,16290] },
+        { label:'Shell Diesel Extra (CN 51)',color:'rgb(134,239,172)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430] },
+        { label:'V-Power Diesel (CN 53)',    color:'rgb(16,185,129)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130] },
+      ]
+    },
+    bp: {
+      title: 'Semua Harga BBM — BP',
+      subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
+      series: [
+        { label:'BP 90 (RON 90)',              color:'rgb(134,239,172)', data:[8800,9100,9700,10300,9800,9800,13300,15360,15360,15360] },
+        { label:'BP 92 (RON 92)',              color:'rgb(16,185,129)',  data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560] },
+        { label:'BP Ultimate 95 (RON 95)',    color:'rgb(5,150,105)',   data:[9500,9800,10400,11000,10500,10500,14300,15760,15760,15760] },
+        { label:'BP Ultimate 98 (RON 98)',    color:'rgb(2,101,71)',    data:[10200,10600,11200,12000,11500,11500,15500,16180,16180,16180] },
+        { label:'BP Diesel (CN 51)',          color:'rgb(147,197,253)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430] },
+        { label:'BP Ultimate Diesel (CN 53)', color:'rgb(59,130,246)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130] },
+      ]
+    },
+    vivo: {
+      title: 'Semua Harga BBM — VIVO',
+      subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
+      series: [
+        { label:'Revvo 89 (RON 89)', color:'rgb(147,197,253)', data:[null,null,null,null,9200,9500,12800,13190,13190,13190] },
+        { label:'Revvo 92 (RON 92)', color:'rgb(59,130,246)',  data:[null,null,null,null,9500,9800,13200,14490,14490,14490] },
+        { label:'Revvo 95 (RON 95)', color:'rgb(29,78,216)',   data:[null,null,null,null,9900,10200,13700,15190,15190,15190] },
+        { label:'Diesel CN 48',      color:'rgb(167,243,208)', data:[null,null,null,null,9000,9300,13000,13700,13700,13700] },
+        { label:'Diesel CN 51',      color:'rgb(16,185,129)',  data:[null,null,null,null,9500,9800,13700,14300,14300,14300] },
+      ]
+    }
+  };
+
+  let priceChart = null;
+  let hiddenSeries = new Set();
+  let currentRange = 5;
+  let activeBrandChart = null;
+
+  function buildChart(years, series) {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    if (priceChart) priceChart.destroy();
+    hiddenSeries = new Set();
+
+    priceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: series.map(s => ({
+          label: s.label,
+          data: s.data,
+          borderColor: s.color,
+          backgroundColor: s.color.replace('rgb(','rgba(').replace(')',',0.07)'),
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          pointBackgroundColor: s.color,
+          tension: 0.35,
+          fill: false,
+          spanGaps: true,
+        }))
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: getChartTheme().tooltipBg,
+            borderColor: getChartTheme().tooltipBorder,
+            borderWidth: 1,
+            titleColor: getChartTheme().tooltipTitle,
+            bodyColor: getChartTheme().tooltipBody,
+            padding: 12,
+            callbacks: {
+              label: c => ` ${c.dataset.label}: Rp ${c.parsed.y != null ? c.parsed.y.toLocaleString('id-ID') : '—'}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: getChartTheme().grid },
+            ticks: { color: getChartTheme().tick, font:{ family:'Space Grotesk', size:12 } }
+          },
+          y: {
+            grid: { color: getChartTheme().grid },
+            ticks: {
+              color: getChartTheme().tick, font:{ family:'Space Grotesk', size:11 },
+              callback: v => 'Rp ' + (v/1000).toFixed(0) + 'k'
+            }
+          }
+        }
+      }
+    });
+    buildLegend(series);
+  }
+
+  function buildLegend(series) {
+    document.getElementById('chartLegend').innerHTML = series.map((s,i) => `
+      <div class="chart-legend-item${hiddenSeries.has(i) ? ' muted' : ''}" onclick="toggleSeries(${i})">
+        <div class="chart-legend-dot" style="background:${s.color}"></div>
+        <span>${s.label}</span>
+      </div>`).join('');
+  }
+
+  function toggleSeries(idx) {
+    const meta = priceChart.getDatasetMeta(idx);
+    meta.hidden = !meta.hidden;
+    hiddenSeries.has(idx) ? hiddenSeries.delete(idx) : hiddenSeries.add(idx);
+    priceChart.update();
+    const series = activeBrandChart ? BRAND_SERIES[activeBrandChart].series : RON92_SERIES;
+    buildLegend(series);
+  }
+
+  function setChartRange(years, btn) {
+    document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentRange = years;
+    const slicedYears = ALL_YEARS.slice(-years);
+    const source = activeBrandChart ? BRAND_SERIES[activeBrandChart].series : RON92_SERIES;
+    buildChart(slicedYears, source.map(s => ({ ...s, data: s.data.slice(-years) })));
+  }
+
+  function selectBrandChart(brand, cardEl) {
+    const wasActive = activeBrandChart === brand;
+    document.querySelectorAll('.price-card').forEach(c => c.classList.remove('chart-active'));
+
+    if (wasActive) {
+      activeBrandChart = null;
+      document.getElementById('chartTitle').textContent = 'Perbandingan Harga RON 92 — Semua Brand';
+      document.getElementById('chartSubtitle').textContent = 'Klik card harga di atas untuk melihat semua BBM brand tersebut';
+      const slicedYears = ALL_YEARS.slice(-currentRange);
+      buildChart(slicedYears, RON92_SERIES.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+    } else {
+      activeBrandChart = brand;
+      cardEl.classList.add('chart-active');
+      const bd = BRAND_SERIES[brand];
+      document.getElementById('chartTitle').textContent = bd.title;
+      document.getElementById('chartSubtitle').textContent = bd.subtitle;
+      const slicedYears = ALL_YEARS.slice(-currentRange);
+      buildChart(slicedYears, bd.series.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+    }
+
+    setTimeout(() => {
+      document.getElementById('priceChart').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
+  }
+
+  // Init: RON 92 semua brand, 5 tahun terakhir
+  buildChart(ALL_YEARS.slice(-5), RON92_SERIES.map(s => ({ ...s, data: s.data.slice(-5) })));
+
+
+
+  // ── Brand Profiles ────────────────────────────────────
+  const BRAND_DATA = {
+    pertamina: {
+      logo: '<img src="./public/assets/Logo/PERTAMINA_id7hJAjeL4_0.svg" alt="Pertamina" class="bex-logo-img">',
+      logoWrapClass: 'logo-img-wrap',
+      color: 'rgb(239,68,68)', flag: '🇮🇩',
+      name: 'Pertamina', origin: 'BUMN Indonesia · est. 1957',
+      desc: 'Pertamina adalah Badan Usaha Milik Negara (BUMN) yang bergerak di sektor energi. Didirikan pada 10 Desember 1957, perusahaan ini menjadi tulang punggung distribusi BBM di seluruh Indonesia — dari Sabang hingga Merauke.',
+      sportImg: './motorsport/pertamina.png',
+      history: 'Didirikan 10 Desember 1957, Pertamina adalah BUMN yang menjadi pionir distribusi BBM di Indonesia. Dengan komitmen terhadap keandalan, inovasi, dan keberlanjutan, Pertamina terus menjadi backbone energi nasional untuk generasi Indonesia yang maju.',
+      fuels: ['Pertalite', 'Pertamax', 'Pertamax Turbo', 'Solar', 'Biosolar', 'Pertadex', 'Avigas'],
+      services: [
+        'Bright Gas — agen LPG bersubsidi dan non-subsidi',
+        'FastPay — layanan keuangan & pembayaran digital',
+        'Bright Store — minimarket resmi di SPBU Pertamina',
+        'Pertamina Pasti Pas — sertifikasi kualitas & takaran pasti',
+        'SPKLU — Stasiun Pengisian Kendaraan Listrik Umum',
+      ]
+    },
+
+    shell: {
+      logo: '<img src="./public/assets/Logo/Shell_id0Yn1dyVO_1.svg" alt="Shell" class="bex-logo-img">',
+      logoWrapClass: 'logo-img-wrap',
+      color: 'rgb(251,191,36)', flag: '🇳🇱',
+      name: 'Shell', origin: 'Royal Dutch Shell · est. 1907',
+      desc: 'Shell adalah perusahaan energi multinasional asal Belanda & Inggris yang berdiri sejak 1907. Hadir di Indonesia sejak awal 1900-an, Shell kini dikenal dengan BBM premium dan teknologi bahan bakar berkualitas tinggi.',
+      sportImg: './motorsport/shell-ferrari.png',
+      history: 'Hadir di Indonesia sejak awal 1900-an, Shell telah menjadi simbol kualitas dan inovasi dalam industri energi. Dengan teknologi terdepan dan layanan premium, Shell berkomitmen memberikan solusi energi terbaik untuk perjalanan Anda.',
+      fuels: ['Shell Super (92)', 'Shell V-Power (95)', 'Shell V-Power Nitro+ (98)', 'Shell Diesel', 'Shell V-Power Diesel'],
+      services: [
+        'Shell Select — convenience store premium di SPBU',
+        'Shell Car Wash — layanan cuci kendaraan otomatis',
+        'Shell Helix — rekomendasi oli mesin resmi',
+        'Shell Loyalty Program — poin reward setiap pengisian',
+        'EV Charging Point — tersedia di sejumlah lokasi pilihan',
+      ]
+    },
+
+    bp: {
+      logo: '<img src="./public/assets/Logo/Bp_Symbol_0.svg" alt="BP" class="bex-logo-img">',
+      logoWrapClass: 'logo-img-wrap',
+      color: 'rgb(16,185,129)', flag: '🇬🇧',
+      name: 'BP', origin: 'British Petroleum · est. 1909',
+      desc: 'BP (British Petroleum) adalah perusahaan energi global asal Inggris yang didirikan tahun 1909. Beroperasi di 70+ negara, BP hadir di Indonesia melalui jaringan SPBU modern dengan standar internasional.',
+      sportImg: './motorsport/bp-audi.png',
+      history: 'Hadir di Indonesia sejak 1950-an, BP telah membangun kepercayaan sebagai mitra energi terpercaya. Dengan jaringan SPBU modern dan standar internasional, BP terus berinovasi untuk memberikan layanan terbaik kepada konsumen Indonesia.',
+      fuels: ['BP 90', 'BP 92', 'BP Ultimate 95', 'BP Ultimate 98', 'BP Diesel', 'BP Ultimate Diesel'],
+      services: [
+        'Wild Bean Cafe — kafe premium di dalam SPBU BP',
+        'BP Car Wash — layanan cuci kendaraan cepat',
+        'BP Castrol — rekomendasi pelumas resmi kendaraan',
+        'BP Me App — aplikasi pembayaran & loyalty rewards',
+        'Air & Water Station — layanan gratis tekanan ban & air',
+      ]
+    },
+
+    vivo: {
+      logo: '<img src="./public/assets/Logo/Logo_Vivo_Energy_Indonesia.png" alt="VIVO" class="bex-logo-img">',
+      logoWrapClass: 'logo-img-wrap',
+      color: 'rgb(59,130,246)', flag: '🇮🇩',
+      name: 'VIVO', origin: 'Vivo Energy Indonesia · est. 2017',
+      desc: 'VIVO Energy Indonesia adalah perusahaan Indonesia yang bergerak di bidang hilirisasi minyak bumi dan gas bumi. Mayoritas saham dipegang oleh Vitol Asia Pte Ltd — afiliasi dari Vitol, perusahaan perdagangan minyak dan gas asal Belanda & Swiss. Beroperasi sejak 2017, VIVO kini melayani wilayah Jabodetabek dan Bandung.',
+      sportImg: './motorsport/vivo-spbu.png',
+      history: 'Sejak 2017, VIVO telah berkembang pesat di pasar Indonesia dengan fokus pada efisiensi, modernitas, dan kepuasan pelanggan. VIVO membuktikan bahwa inovasi dan dedikasi dapat menciptakan standar baru dalam industri SPBU.',
+      fuels: ['VIVO Revvo 89', 'VIVO Revvo 92', 'VIVO Revvo 95', 'VIVO Primus Plus Diesel (CN 51)'],
+      services: [
+        'VIVO Minimart — toko serba ada di area SPBU',
+        'Air Compressor — pengisian angin ban gratis',
+        'ATM Center — tersedia di berbagai lokasi SPBU',
+        'Toilet & Mushola — fasilitas umum 24 jam',
+        'VIVO App — promo & voucher digital eksklusif',
+      ]
+    }
+  };
+
+  let activeBrand = null;
+
+  function selectBrand(key, cardEl) {
+    const panel = document.getElementById('brand-expand');
+    const d = BRAND_DATA[key];
+
+    if (activeBrand === key) {
+      activeBrand = null;
+      cardEl.classList.remove('active');
+      panel.classList.remove('open');
+      return;
+    }
+
+    document.querySelectorAll('.brand-card').forEach(c => c.classList.remove('active'));
+    cardEl.classList.add('active');
+    activeBrand = key;
+
+    panel.innerHTML = `
+      <div class="brand-expand-inner" style="--expand-color: ${d.color}">
+        <div>
+          <div class="bex-header">
+            <div class="bex-logo ${d.logoWrapClass || ''}">${d.logo}</div>
+            <div>
+              <p class="bex-title">${d.flag} ${d.name}</p>
+              <p class="bex-origin">${d.origin}</p>
+            </div>
+          </div>
+          <p class="bex-desc">${d.desc}</p>
+          ${d.sportImg ? `<img src="${d.sportImg}" alt="${d.name}" class="bex-sport-img">` : ''}
+        </div>
+        <div class="bex-divider"></div>
+        <div>
+          <p class="bex-section-title">Bahan Bakar</p>
+          <div class="bex-fuels">
+            ${d.fuels.map(f => `<span class="bex-fuel-pill">${f}</span>`).join('')}
+          </div>
+          <p class="bex-section-title">Layanan di SPBU</p>
+          <div class="bex-services">
+            ${d.services.map(s => `<div class="bex-service"><div class="bex-service-dot"></div><span>${s}</span></div>`).join('')}
+          </div>
+          <p class="bex-section-title">Sejarah Singkat</p>
+          <p class="bex-history">${d.history}</p>
+        </div>
+      </div>`;
+
+    panel.classList.add('open');
+
+    setTimeout(() => {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  }
+
+  document.querySelectorAll(".btn-cta, .btn-primary").forEach((b) => {
+    b.addEventListener("click", () => {
+      window.location.href = "./index.html";
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "updated": "2026-05-01",
+  "sources": {
+    "Pertamina": "oto.com",
+    "Shell": "fallback",
+    "BP": "fallback",
+    "VIVO": "fallback"
+  },
+  "note": "Harga Rupiah/liter. Pertamina: wilayah Jawa & Bali. Shell/BP/VIVO: estimasi.",
+  "Pertamina": {
+    "Pertalite": 10000,
+    "Pertamax": 12300,
+    "Pertamax Turbo": 13100,
+    "Solar": 6800,
+    "Dexlite": 14200,
+    "Pertamina Dex": 14500
+  },
+  "Shell": {
+    "Shell Super": 13250,
+    "Shell V-Power": 14550,
+    "Shell Diesel Extra": 14100
+  },
+  "BP": {
+    "BP 92": 13250,
+    "BP 95": 14550,
+    "BP Diesel": 14100
+  },
+  "VIVO": {
+    "Revvo 92": 13150,
+    "Revvo 95": 14450,
+    "Revvo D": 13950
+  }
+}

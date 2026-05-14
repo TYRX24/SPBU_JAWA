@@ -1,0 +1,22 @@
+# 1. Kunci Rahasia (SANGAT PENTING: Jangan sampai API Key Google Maps Anda bocor!)
+.env
+
+# 2. Python Virtual Environment & Cache
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# 3. File Data Mentah Spasial (Ukurannya terlalu besar untuk GitHub)
+Peta_Jawa/
+uploads/
+*.geojson
+
+# CATATAN: folder 'data/' dan file 'stations.json' sengaja TIDAK KITA MASUKKAN ke sini.
+# Alasannya: File tersebut harus ikut ter-upload agar aplikasi peta Anda bisa membacanya 
+# saat nanti di-hosting / di-deploy ke Vercel.
+
+# 4. Folder Sistem (Bawaan Windows/Mac)
+.DS_Store
+Thumbs.db
+.claude/

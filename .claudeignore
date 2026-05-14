@@ -1,0 +1,20 @@
+# Python Virtual Environment (SANGAT PENTING)
+.venv/
+__pycache__/
+
+# Folder Data Spasial & JSON
+data/
+Peta_Jawa/
+uploads/
+*.geojson
+
+# Folder Aset & Logo (Mencegah Claude membaca kode SVG)
+Logo/
+*.png
+*.jpg
+*.svg
+
+# Sistem
+.claude/
+.github/
+.env
