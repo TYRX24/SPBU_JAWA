@@ -847,8 +847,10 @@
           <p class="price-chart-subtitle" id="chartSubtitle">Klik card harga di atas untuk melihat semua BBM brand tersebut</p>
         </div>
         <div class="chart-range-group">
-          <button class="chart-range-btn active" onclick="setChartRange(5, this)">5 Tahun</button>
-          <button class="chart-range-btn" onclick="setChartRange(10, this)">10 Tahun</button>
+          <button class="chart-range-btn" onclick="setChartRange('3m', this)">3 Bln</button>
+          <button class="chart-range-btn" onclick="setChartRange('6m', this)">6 Bln</button>
+          <button class="chart-range-btn active" onclick="setChartRange('1y', this)">1 Thn</button>
+          <button class="chart-range-btn" onclick="setChartRange('5y', this)">5 Thn</button>
         </div>
       </div>
       <canvas id="priceChart" height="90"></canvas>
@@ -1015,9 +1017,9 @@
     applyTheme(next);
     // Rebuild chart dengan warna tema baru (aman: dipanggil setelah halaman penuh load)
     if (priceChart) {
-      const slicedYears = ALL_YEARS.slice(-currentRange);
       const source = activeBrandChart ? BRAND_SERIES[activeBrandChart].series : RON92_SERIES;
-      buildChart(slicedYears, source.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+      const { labels, slicedSeries } = getSlicedData(currentRangeKey, source);
+      buildChart(labels, slicedSeries);
     }
   }
 
@@ -1056,13 +1058,27 @@
     };
   }
 
-  const ALL_YEARS = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+  const ALL_YEARS  = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+  const ALL_MONTHS = ["Mar '24","Apr '24","Mei '24","Jun '24","Jul '24","Ags '24",
+                      "Sep '24","Okt '24","Nov '24","Des '24",
+                      "Jan '25","Feb '25","Mar '25","Apr '25","Mei '25"];
+
+  // Helper: buat array monthly flat dari satu nilai harga (15 titik = panjang ALL_MONTHS)
+  function flatMonths(price) {
+    return price != null
+      ? new Array(ALL_MONTHS.length).fill(price)
+      : new Array(ALL_MONTHS.length).fill(null);
+  }
 
   const RON92_SERIES = [
-    { label:'Pertamina Pertamax (RON 92)', color:'rgb(239,68,68)',   data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950] },
-    { label:'Shell Super (RON 92)',         color:'rgb(251,191,36)',  data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360] },
-    { label:'BP 92 (RON 92)',               color:'rgb(16,185,129)',  data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560] },
-    { label:'VIVO Revvo 92 (RON 92)',       color:'rgb(59,130,246)',  data:[null,null,null,null,9500,9800,13200,14490,14490,14490] },
+    { label:'Pertamina Pertamax (RON 92)', color:'rgb(239,68,68)',
+      data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950], monthly:flatMonths(12950) },
+    { label:'Shell Super (RON 92)',        color:'rgb(251,191,36)',
+      data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360], monthly:flatMonths(15360) },
+    { label:'BP 92 (RON 92)',              color:'rgb(16,185,129)',
+      data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560], monthly:flatMonths(15560) },
+    { label:'VIVO Revvo 92 (RON 92)',      color:'rgb(59,130,246)',
+      data:[null,null,null,null,9500,9800,13200,14490,14490,14490], monthly:flatMonths(14490) },
   ];
 
   const BRAND_SERIES = {
@@ -1070,54 +1086,74 @@
       title: 'Semua Harga BBM — Pertamina',
       subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
       series: [
-        { label:'Pertalite (RON 90)',       color:'rgb(251,113,113)', data:[7350,7500,7800,7650,7650,7650,10000,10000,10000,10000] },
-        { label:'Pertamax (RON 92)',         color:'rgb(239,68,68)',   data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950] },
-        { label:'Pertamax Turbo (RON 98)',  color:'rgb(185,28,28)',   data:[null,null,10900,12000,10900,10900,14500,14000,14000,14000] },
-        { label:'Solar (CN 48)',            color:'rgb(134,239,172)', data:[5650,5650,5650,5650,5650,5650,6800,6800,6800,6800] },
-        { label:'Dexlite (CN 51)',          color:'rgb(16,185,129)',  data:[null,7500,8000,9500,9200,9500,17800,13700,13700,13700] },
-        { label:'Pertamina Dex (CN 53)',    color:'rgb(5,150,105)',   data:[null,null,10200,11500,10500,10500,18000,14050,14050,14050] },
+        { label:'Pertalite (RON 90)',       color:'rgb(251,113,113)', data:[7350,7500,7800,7650,7650,7650,10000,10000,10000,10000], monthly:flatMonths(10000) },
+        { label:'Pertamax (RON 92)',        color:'rgb(239,68,68)',   data:[8250,8900,9500,10000,9000,9000,12500,12950,12950,12950], monthly:flatMonths(12950) },
+        { label:'Pertamax Turbo (RON 98)', color:'rgb(185,28,28)',   data:[null,null,10900,12000,10900,10900,14500,14000,14000,14000], monthly:flatMonths(14000) },
+        { label:'Solar (CN 48)',           color:'rgb(134,239,172)', data:[5650,5650,5650,5650,5650,5650,6800,6800,6800,6800], monthly:flatMonths(6800) },
+        { label:'Dexlite (CN 51)',         color:'rgb(16,185,129)',  data:[null,7500,8000,9500,9200,9500,17800,13700,13700,13700], monthly:flatMonths(13700) },
+        { label:'Pertamina Dex (CN 53)',   color:'rgb(5,150,105)',   data:[null,null,10200,11500,10500,10500,18000,14050,14050,14050], monthly:flatMonths(14050) },
       ]
     },
     shell: {
       title: 'Semua Harga BBM — Shell',
       subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
       series: [
-        { label:'Shell Super (RON 92)',       color:'rgb(253,224,71)',  data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360] },
-        { label:'Shell V-Power (RON 95)',     color:'rgb(251,191,36)',  data:[9550,9800,10400,11000,10500,10500,14300,15760,15760,15760] },
-        { label:'V-Power Nitro+ (RON 98)',   color:'rgb(202,138,4)',   data:[10200,10600,11200,12000,11500,11500,15500,16290,16290,16290] },
-        { label:'Shell Diesel Extra (CN 51)',color:'rgb(134,239,172)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430] },
-        { label:'V-Power Diesel (CN 53)',    color:'rgb(16,185,129)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130] },
+        { label:'Shell Super (RON 92)',       color:'rgb(253,224,71)',  data:[8950,9250,9900,10500,9900,9900,13500,15360,15360,15360], monthly:flatMonths(15360) },
+        { label:'Shell V-Power (RON 95)',     color:'rgb(251,191,36)',  data:[9550,9800,10400,11000,10500,10500,14300,15760,15760,15760], monthly:flatMonths(15760) },
+        { label:'V-Power Nitro+ (RON 98)',   color:'rgb(202,138,4)',   data:[10200,10600,11200,12000,11500,11500,15500,16290,16290,16290], monthly:flatMonths(16290) },
+        { label:'Shell Diesel Extra (CN 51)',color:'rgb(134,239,172)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430], monthly:flatMonths(15430) },
+        { label:'V-Power Diesel (CN 53)',    color:'rgb(16,185,129)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130], monthly:flatMonths(16130) },
       ]
     },
     bp: {
       title: 'Semua Harga BBM — BP',
       subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
       series: [
-        { label:'BP 90 (RON 90)',              color:'rgb(134,239,172)', data:[8800,9100,9700,10300,9800,9800,13300,15360,15360,15360] },
-        { label:'BP 92 (RON 92)',              color:'rgb(16,185,129)',  data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560] },
-        { label:'BP Ultimate 95 (RON 95)',    color:'rgb(5,150,105)',   data:[9500,9800,10400,11000,10500,10500,14300,15760,15760,15760] },
-        { label:'BP Ultimate 98 (RON 98)',    color:'rgb(2,101,71)',    data:[10200,10600,11200,12000,11500,11500,15500,16180,16180,16180] },
-        { label:'BP Diesel (CN 51)',          color:'rgb(147,197,253)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430] },
-        { label:'BP Ultimate Diesel (CN 53)', color:'rgb(59,130,246)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130] },
+        { label:'BP 90 (RON 90)',              color:'rgb(134,239,172)', data:[8800,9100,9700,10300,9800,9800,13300,15360,15360,15360], monthly:flatMonths(15360) },
+        { label:'BP 92 (RON 92)',              color:'rgb(16,185,129)',  data:[9000,9300,9900,10600,10000,10000,13600,15560,15560,15560], monthly:flatMonths(15560) },
+        { label:'BP Ultimate 95 (RON 95)',    color:'rgb(5,150,105)',   data:[9500,9800,10400,11000,10500,10500,14300,15760,15760,15760], monthly:flatMonths(15760) },
+        { label:'BP Ultimate 98 (RON 98)',    color:'rgb(2,101,71)',    data:[10200,10600,11200,12000,11500,11500,15500,16180,16180,16180], monthly:flatMonths(16180) },
+        { label:'BP Diesel (CN 51)',          color:'rgb(147,197,253)', data:[null,8000,8500,10000,9800,10000,18000,15430,15430,15430], monthly:flatMonths(15430) },
+        { label:'BP Ultimate Diesel (CN 53)',color:'rgb(59,130,246)',  data:[null,null,9500,11000,10800,11000,19000,16130,16130,16130], monthly:flatMonths(16130) },
       ]
     },
     vivo: {
       title: 'Semua Harga BBM — VIVO',
       subtitle: 'Klik card yang sama untuk kembali ke perbandingan RON 92',
       series: [
-        { label:'Revvo 89 (RON 89)', color:'rgb(147,197,253)', data:[null,null,null,null,9200,9500,12800,13190,13190,13190] },
-        { label:'Revvo 92 (RON 92)', color:'rgb(59,130,246)',  data:[null,null,null,null,9500,9800,13200,14490,14490,14490] },
-        { label:'Revvo 95 (RON 95)', color:'rgb(29,78,216)',   data:[null,null,null,null,9900,10200,13700,15190,15190,15190] },
-        { label:'Diesel CN 48',      color:'rgb(167,243,208)', data:[null,null,null,null,9000,9300,13000,13700,13700,13700] },
-        { label:'Diesel CN 51',      color:'rgb(16,185,129)',  data:[null,null,null,null,9500,9800,13700,14300,14300,14300] },
+        { label:'Revvo 89 (RON 89)', color:'rgb(147,197,253)', data:[null,null,null,null,9200,9500,12800,13190,13190,13190], monthly:flatMonths(13190) },
+        { label:'Revvo 92 (RON 92)', color:'rgb(59,130,246)',  data:[null,null,null,null,9500,9800,13200,14490,14490,14490], monthly:flatMonths(14490) },
+        { label:'Revvo 95 (RON 95)', color:'rgb(29,78,216)',   data:[null,null,null,null,9900,10200,13700,15190,15190,15190], monthly:flatMonths(15190) },
+        { label:'Diesel CN 48',      color:'rgb(167,243,208)', data:[null,null,null,null,9000,9300,13000,13700,13700,13700], monthly:flatMonths(13700) },
+        { label:'Diesel CN 51',      color:'rgb(16,185,129)',  data:[null,null,null,null,9500,9800,13700,14300,14300,14300], monthly:flatMonths(14300) },
       ]
     }
   };
 
-  let priceChart = null;
-  let hiddenSeries = new Set();
-  let currentRange = 5;
+  let priceChart    = null;
+  let hiddenSeries  = new Set();
+  let currentRangeKey = '1y';   // default: 1 tahun (monthly)
   let activeBrandChart = null;
+
+  // Helper: pilih labels & data sesuai range key
+  function getSlicedData(rangeKey, source) {
+    if (rangeKey === '3m' || rangeKey === '6m' || rangeKey === '1y') {
+      const n = rangeKey === '3m' ? 3 : rangeKey === '6m' ? 6 : 12;
+      const take = Math.min(n, ALL_MONTHS.length);
+      const labels = ALL_MONTHS.slice(-take);
+      const slicedSeries = source.map(s => ({
+        ...s,
+        data: (s.monthly || new Array(ALL_MONTHS.length).fill(s.data[s.data.length - 1])).slice(-take)
+      }));
+      return { labels, slicedSeries };
+    } else {
+      // '5y' — pakai data tahunan
+      return {
+        labels: ALL_YEARS.slice(-5),
+        slicedSeries: source.map(s => ({ ...s, data: s.data.slice(-5) }))
+      };
+    }
+  }
 
   function buildChart(years, series) {
     const ctx = document.getElementById('priceChart').getContext('2d');
@@ -1194,13 +1230,13 @@
     buildLegend(series);
   }
 
-  function setChartRange(years, btn) {
+  function setChartRange(rangeKey, btn) {
     document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    currentRange = years;
-    const slicedYears = ALL_YEARS.slice(-years);
+    currentRangeKey = rangeKey;
     const source = activeBrandChart ? BRAND_SERIES[activeBrandChart].series : RON92_SERIES;
-    buildChart(slicedYears, source.map(s => ({ ...s, data: s.data.slice(-years) })));
+    const { labels, slicedSeries } = getSlicedData(rangeKey, source);
+    buildChart(labels, slicedSeries);
   }
 
   function selectBrandChart(brand, cardEl) {
@@ -1211,16 +1247,16 @@
       activeBrandChart = null;
       document.getElementById('chartTitle').textContent = 'Perbandingan Harga RON 92 — Semua Brand';
       document.getElementById('chartSubtitle').textContent = 'Klik card harga di atas untuk melihat semua BBM brand tersebut';
-      const slicedYears = ALL_YEARS.slice(-currentRange);
-      buildChart(slicedYears, RON92_SERIES.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+      const { labels, slicedSeries } = getSlicedData(currentRangeKey, RON92_SERIES);
+      buildChart(labels, slicedSeries);
     } else {
       activeBrandChart = brand;
       cardEl.classList.add('chart-active');
       const bd = BRAND_SERIES[brand];
       document.getElementById('chartTitle').textContent = bd.title;
       document.getElementById('chartSubtitle').textContent = bd.subtitle;
-      const slicedYears = ALL_YEARS.slice(-currentRange);
-      buildChart(slicedYears, bd.series.map(s => ({ ...s, data: s.data.slice(-currentRange) })));
+      const { labels, slicedSeries } = getSlicedData(currentRangeKey, bd.series);
+      buildChart(labels, slicedSeries);
     }
 
     setTimeout(() => {
@@ -1228,8 +1264,9 @@
     }, 80);
   }
 
-  // Init: RON 92 semua brand, 5 tahun terakhir
-  buildChart(ALL_YEARS.slice(-5), RON92_SERIES.map(s => ({ ...s, data: s.data.slice(-5) })));
+  // Init: RON 92 semua brand, default 1 tahun terakhir (monthly)
+  const { labels: initLabels, slicedSeries: initSeries } = getSlicedData('1y', RON92_SERIES);
+  buildChart(initLabels, initSeries);
 
 
 

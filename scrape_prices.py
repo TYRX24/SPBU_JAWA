@@ -177,3 +177,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+OUT.parent.mkdir(parents=True, exist_ok=True)  # Auto-create data/ folder
